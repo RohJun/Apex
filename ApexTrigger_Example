@@ -1,0 +1,33 @@
+//Contact's lead Source 업데이트가 되면 실행
+trigger leadSourceUpdate on Contact (after update) {
+	  //채터 피드 리스트
+    //List<FeedItem> posts = new List<FeedItem>();
+    //List<contactHistory__c> historyPosts = new List<contactHistory__c>();
+    
+    for(Contact con: Trigger.new){
+        Contact newContact = Trigger.newMap.get(con.Id);
+        Contact oldContact = Trigger.oldMap.get(con.Id);
+        Contact conName = Trigger.newMap.get(con.Name);
+        //업데이트 확인(새로운 값이 이전값과 다르면)
+        if(newContact.LeadSource != oldContact.LeadSource){
+            //Chatter updated message
+            String message = 'Contact Lead Source Updated :' + oldContact.LeadSource + ' to ' + newContact.LeadSource;
+            String name = newContact.FirstName + newContact.LastName;
+            FeedItem post = new FeedItem(
+            ParentId = con.Id,
+            Title = 'Lead Source Update',
+            Body = message
+            );
+            insert post; 
+            
+            //History updated message
+            contactHistory__c historyPost = new contactHistory__c(
+            	Name = name + 'Updated',
+                Message__c = message
+            );
+            insert historyPost;
+
+        }
+        
+    }
+}
