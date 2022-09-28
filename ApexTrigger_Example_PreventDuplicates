@@ -1,0 +1,17 @@
+Situation:
+고객정보(Account) 생성중에 고객정보 개체의 사업자등록번호・고객정보명의 중복확인
+
+trigger AccountPreventDuplicates on Account (before insert) {
+	//고객정보 개체의 사업자등록번호・고객정보명의 중복확인
+	List <Account> accountList = new List<Account>([SELECT Business_License_Number__c,Name from Account]);
+    
+    for(Account newAccountList:Trigger.new){
+        for(Account accountList: accountList){
+            //입력된 사업자등록번호와 이미 등록된 사업자등록번호 비교
+            if(newAccountList.Business_License_Number__c == accountList.Business_License_Number__c){
+                newAccountList.addError('이미 등록되어 있는 사업자등록번호입니다. 다시 확인해주세요.');
+            }
+        }
+    }
+    
+}
